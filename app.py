@@ -7,6 +7,5 @@
 6) engineer output to give more than one image if semantically close
 7) Output image by comparing it to a dictionary 
 8) create a simple frontend 
+f
 """
-
-
