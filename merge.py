@@ -110,16 +110,50 @@ def run_inference_once(image_path,i):
                     prompt=prompt)
 
 
-    with open("prompts2.txt", 'w') as file:
-        x = chain(image_tags)
-        master_list[x['text']] = image_path
-        file.write(x['text'] + "\n\n")
+    x = chain(image_tags)
+    master_list[x['text']] = image_path
 
 
 
-file_len = len(image_files)
+
+file_len = len(image_files) 
 for i in range(0, file_len):
     image_path = image_files[i]
     run_inference_once(image_path,i)
 
-print(master_list)
+
+with open("prompts2.txt", 'w') as file:
+    for i in master_list:
+        file.write(i + "\n\n")
+
+
+def create_embedding():
+    loader = TextLoader('prompts.txt')
+    data = loader.load()
+    print(data)
+    vectordb = FAISS.from_documents(
+    documents=data,
+    embedding=embedding
+)
+    vectordb.save_local("embeddings/prompts/faiss_index")
+
+def search():
+    vectordb = FAISS.load_local(r"C:\Users\SJ98023\ImageSearch\embeddings\prompts\faiss_index\index.faiss", embedding)
+    template =  """Multiple images have been described through tags below, Your role is to identify the most relevant image descriptions based on the user's input query. Below are descriptions of multiple images:
+                {context}
+                The user will provide an image description query, and your task is to find one pip or more matching descriptions from the provided context. If there are no matching descriptions, respond with "There are no matching descriptions."
+                User Query: {question}
+                Helpful Answer:"""
+    prompt = PromptTemplate(input_variables=['context', 'question'], template=template)
+    qa= RetrievalQA.from_chain_type(
+    llm,
+    retriever=vectordb.as_retriever(),
+    chain_type="stuff",
+    chain_type_kwargs={"prompt": prompt}
+)
+    question = str("Girl in the river")
+    result = qa({"query": question})
+    print(result['result'])
+
+create_embedding
+search()
