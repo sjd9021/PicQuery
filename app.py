@@ -7,7 +7,12 @@
 6) engineer output to give more than one image if semantically close
 7) Output image by comparing it to a dictionary 
 8) create a simple frontend 
-f
+
+Things To do:
+2) Parse the output and store the output with an image
+3) Connect both files with the LLM
+4) Output Images Instead of the prompt
+5) Create Streamlit Frontend 
 """
 
 
@@ -89,7 +94,7 @@ def search():
     vectordb = FAISS.load_local("embeddings/prompts/faiss_index", embedding)
     template =  """Multiple images have been described through tags below, Your role is to identify the most relevant image descriptions based on the user's input query. Below are descriptions of multiple images:
                 {context}
-                The user will provide an image description query, and your task is to find one or more matching descriptions from the provided context. If there are no matching descriptions, respond with "There are no matching descriptions."
+                The user will provide an image description query, and your task is to find one pip or more matching descriptions from the provided context. If there are no matching descriptions, respond with "There are no matching descriptions."
                 User Query: {question}
                 Helpful Answer:"""
     prompt = PromptTemplate(input_variables=['context', 'question'], template=template)
